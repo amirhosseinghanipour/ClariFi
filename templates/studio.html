@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ClariFi Studio{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/studio.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="relative">
+    <button id="left-tools-toggle" class="md:hidden fixed left-0 top-1/2 transform -translate-y-1/2 bg-black text-white p-2 z-30 border-r-2 border-white">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+        </svg>
+    </button>
+    <button id="right-tools-toggle" class="md:hidden fixed right-0 top-1/2 transform -translate-y-1/2 bg-black text-white p-2 z-30 border-l-2 border-white">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+        </svg>
+    </button>
+
+    <div id="drag-overlay" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center hidden z-50">
+        <p class="text-4xl font-mono uppercase text-white text-center">DROP ANYWHERE TO UPLOAD THE IMAGE</p>
+    </div>
+
+    <aside id="left-tools" class="fixed mt-20 md:mt-0 left-0 w-64 h-full overflow-y-auto bg-black border-r-2 border-white p-4 z-20 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+        <button class="md:hidden absolute top-2 right-2 text-black hover:text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <h2 class="text-2xl mb-4 font-mono uppercase">TOOLS</h2>
+        <div class="space-y-4">
+            <div class="accordion">
+                <button class="accordion-toggle">UPLOAD</button>
+                <div class="accordion-content space-y-2 p-2" style="display: block;"> 
+                    <div id="upload-prompt-studio" class="relative flex items-center justify-center h-32 bg-black bg-opacity-80 border-2 border-white cursor-pointer">
+                        <p class="text-xl font-mono uppercase text-white text-center p-2">CLICK OR DRAG IMAGE</p>
+                        <input type="file" id="image-upload" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                    </div>
+                    <p id="upload-feedback" class="text-sm font-mono uppercase" style="display: none;"></p>
+                    <button id="clear-image" class="button-style w-full">CLEAR IMAGE</button>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-toggle">ADJUSTMENTS</button>
+                <div class="accordion-content space-y-4 p-2"> 
+                    <div>
+                        <label for="brightness" class="text-sm font-mono uppercase block mb-1">BRIGHTNESS</label>
+                        <input type="range" id="brightness" min="0" max="2" step="0.05" value="1" class="w-full slider">
+                    </div>
+                    <div>
+                        <label for="contrast" class="text-sm font-mono uppercase block mb-1">CONTRAST</label>
+                        <input type="range" id="contrast" min="0" max="2" step="0.05" value="1" class="w-full slider">
+                    </div>
+                    <div>
+                        <label for="saturation" class="text-sm font-mono uppercase block mb-1">SATURATION</label>
+                        <input type="range" id="saturation" min="0" max="2" step="0.05" value="1" class="w-full slider">
+                    </div>
+                    <div class="opacity-50 cursor-not-allowed">
+                        <label class="text-sm font-mono uppercase block mb-1 tooltip" data-tooltip="COMING SOON">HUE</label>
+                        <input type="range" disabled class="w-full slider">
+                    </div>
+                    <div class="opacity-50 cursor-not-allowed">
+                        <label class="text-sm font-mono uppercase block mb-1 tooltip" data-tooltip="COMING SOON">EXPOSURE</label>
+                        <input type="range" disabled class="w-full slider">
+                    </div>
+                    <div class="opacity-50 cursor-not-allowed">
+                        <label class="text-sm font-mono uppercase block mb-1 tooltip" data-tooltip="COMING SOON">VIBRANCE</label>
+                        <input type="range" disabled class="w-full slider">
+                    </div>
+                    <button id="reset-adjustments" class="button-style w-full mt-2">RESET ADJUST</button>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <aside id="right-tools" class="fixed right-0 mt-20 md:mt-0 w-64 h-full overflow-y-auto bg-black border-l-2 border-white p-4 z-20 transform translate-x-full md:translate-x-0 transition-transform duration-300">
+        <button class="md:hidden absolute top-2 right-2 text-black hover:text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <h2 class="text-2xl mb-4 font-mono uppercase">MORE TOOLS</h2>
+        <div class="space-y-4">
+            <div class="accordion">
+                <button class="accordion-toggle">FILTERS</button>
+                <div class="accordion-content grid grid-cols-2 gap-2 p-2">
+                    <button id="filter-none" class="button-style tooltip" data-tooltip="REMOVE FILTER">NONE</button>
+                    <button id="grayscale" class="button-style tooltip" data-tooltip="GRAYSCALE">GRAY</button>
+                    <button id="sepia" class="button-style tooltip" data-tooltip="SEPIA">SEPIA</button>
+                    <button id="blur" class="button-style tooltip" data-tooltip="BLUR">BLUR</button>
+                    <button id="sharpen" class="button-style tooltip" data-tooltip="SHARPEN">SHARP</button>
+                    <button id="invert" class="button-style tooltip" data-tooltip="INVERT COLORS">INVERT</button>
+                    <button class="button-style opacity-50 cursor-not-allowed tooltip" data-tooltip="COMING SOON">VIGNETTE</button>
+                    <button class="button-style opacity-50 cursor-not-allowed tooltip" data-tooltip="COMING SOON">NOISE</button>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-toggle">TRANSFORM</button>
+                <div class="accordion-content space-y-4 p-2">
+                    <div>
+                        <label class="text-sm font-mono uppercase block mb-1">CROP (PX)</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="crop-left" class="p-1 w-full" placeholder="LEFT">
+                            <input type="number" id="crop-top" class="p-1 w-full" placeholder="TOP">
+                            <input type="number" id="crop-right" class="p-1 w-full" placeholder="RIGHT">
+                            <input type="number" id="crop-bottom" class="p-1 w-full" placeholder="BOTTOM">
+                        </div>
+                        <button id="apply-crop" class="button-style w-full mt-2">APPLY CROP</button>
+                    </div>
+                    <div>
+                        <label class="text-sm font-mono uppercase block mb-1">RESIZE (PX)</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="resize-width" class="p-1 w-full" placeholder="WIDTH">
+                            <input type="number" id="resize-height" class="p-1 w-full" placeholder="HEIGHT">
+                        </div>
+                        <label class="flex items-center mt-1">
+                            <input type="checkbox" id="keep-aspect" class="mr-2" checked>
+                            <span class="text-xs font-mono uppercase">KEEP ASPECT</span>
+                        </label>
+                        <button id="apply-resize" class="button-style w-full mt-2">APPLY RESIZE</button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                        <button id="rotate-left" class="button-style w-full tooltip" data-tooltip="ROTATE -90°">ROT L</button>
+                        <button id="rotate-right" class="button-style w-full tooltip" data-tooltip="ROTATE +90°">ROT R</button>
+                        <button id="flip-horizontal" class="button-style w-full tooltip" data-tooltip="FLIP HORIZONTAL">FLIP H</button>
+                        <button id="flip-vertical" class="button-style w-full tooltip" data-tooltip="FLIP VERTICAL">FLIP V</button>
+                    </div>
+                    <div class="opacity-50 cursor-not-allowed mt-2">
+                        <button class="button-style w-full tooltip" data-tooltip="COMING SOON">PERSPECTIVE</button>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion">
+                <button class="accordion-toggle">EXPORT</button>
+                <div class="accordion-content space-y-2 p-2">
+                    <label for="export-format" class="text-sm font-mono uppercase block mb-1">FORMAT</label>
+                    <select id="export-format" class="w-full p-1">
+                        <option value="png">PNG</option>
+                        <option value="jpeg">JPEG</option>
+                        <option value="webp">WEBP</option>
+                        <option value="gif">GIF</option>
+                    </select>
+                    <div id="jpeg-quality-section">
+                        <label for="jpeg-quality" class="text-sm font-mono uppercase block mb-1">JPEG QUALITY (0-1)</label>
+                        <input type="range" id="jpeg-quality" min="0.1" max="1" step="0.05" value="0.9" class="w-full slider">
+                    </div>
+                    <button id="download" class="button-style w-full mt-2">DOWNLOAD</button>
+                    <button id="save" class="button-style w-full mt-2 opacity-50 cursor-not-allowed tooltip" data-tooltip="COMING SOON">SAVE TO CLOUD</button>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-4 md:mx-64"> 
+        <div class="container mx-auto">
+            <h1 class="text-4xl font-mono uppercase mb-6 text-center">STUDIO</h1>
+            <div class="border-2 border-white p-6 overflow-auto">
+                <h2 class="text-2xl mb-4 font-mono uppercase">CANVAS</h2>
+                <div id="canvas-container" class="relative flex justify-center items-center min-h-[400px]"> 
+                    <canvas id="preview-canvas" class="border-2 border-white max-w-full max-h-[70vh] h-auto block checkerboard-bg"></canvas> 
+                    <div id="studio-placeholder" class="absolute inset-0 flex items-center justify-center text-center font-mono uppercase text-gray-500 transition-opacity duration-300"></div>
+                </div>
+                <div class="flex justify-center space-x-4 mt-4">
+                    <button id="undo" class="button-style">UNDO</button>
+                    <button id="redo" class="button-style">REDO</button> 
+                </div>
+                <div class="text-center text-xs font-mono uppercase mt-2 text-gray-400" id="image-dimensions">
+                    DIMENSIONS: --- x ---
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.querySelectorAll('.accordion-toggle').forEach(button => {
+        button.addEventListener('click', () => {
+            const content = button.nextElementSibling;
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        });
+        const defaultOpen = ['UPLOAD', 'ADJUSTMENTS', 'FILTERS', 'EXPORT'];
+        if (defaultOpen.includes(button.textContent)) {
+            button.nextElementSibling.style.display = 'block';
+        } else {
+            button.nextElementSibling.style.display = 'none';
+        }
+    });
+
+    const formatSelect = document.getElementById('export-format');
+    const jpegQualitySection = document.getElementById('jpeg-quality-section');
+    formatSelect.addEventListener('change', () => {
+        jpegQualitySection.style.display = formatSelect.value === 'jpeg' ? 'block' : 'none';
+    });
+    jpegQualitySection.style.display = formatSelect.value === 'jpeg' ? 'block' : 'none';
+
+    document.getElementById('left-tools-toggle').addEventListener('click', () => {
+        const leftTools = document.getElementById('left-tools');
+        leftTools.classList.toggle('-translate-x-full');
+    });
+
+    document.getElementById('right-tools-toggle').addEventListener('click', () => {
+        const rightTools = document.getElementById('right-tools');
+        rightTools.classList.toggle('translate-x-full');
+    });
+
+    document.querySelectorAll('#left-tools button, #right-tools button').forEach(button => {
+        if (button.innerHTML.includes('M6 18L18 6M6 6l12 12')) {
+            button.addEventListener('click', () => {
+                const sidebar = button.closest('aside');
+                if (sidebar.id === 'left-tools') {
+                    sidebar.classList.add('-translate-x-full');
+                } else {
+                    sidebar.classList.add('translate-x-full');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    .slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 4px;
+        background: #ffffff;
+        outline: none;
+        opacity: 0.9;
+        transition: opacity .2s;
+        border: 1px solid #ffffff;
+    }
+    .slider:{
+        opacity: 1;
+    }
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 15px;
+        height: 15px;
+        background: #ffffff;
+        border: 2px solid #000000;
+        cursor: pointer;
+    }
+    .slider::-moz-range-thumb {
+        width: 15px;
+        height: 15px;
+        background: #ffffff;
+        border: 2px solid #000000;
+        cursor: pointer;
+        border-radius: 0;
+    }
+    .checkerboard-bg {
+        background-image: linear-gradient(45deg, #444 25%, transparent 25%), linear-gradient(-45deg, #444 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #444 75%), linear-gradient(-45deg, transparent 75%, #444 75%);
+        background-size: 20px 20px;
+        background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        background-color: #222;
+    }
+    .backdrop-blur-sm {
+        backdrop-filter: blur(5px);
+    }
+    #studio-placeholder, #preview-canvas {
+        opacity: 1;
+        transition: opacity 0.3s ease;
+    }
+    #studio-placeholder.hidden, #preview-canvas.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+    @media (max-width: 767px) {
+        #left-tools, #right-tools {
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        #left-tools-toggle, #right-tools-toggle {
+            z-index: 40;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ClariFi{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300..900&display=swap" rel="stylesheet">
+    {% block script %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: "Darker Grotesque", sans-serif;
+            font-optical-sizing: auto;
+            font-style: normal;
+            font-weight: bold;
+            line-height: 1.2;
+            padding-top: 5rem;
+        }
+        h1, h2, h3 {
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        button, input, select, a.button-style {
+            background-color: #ffffff;
+            color: #000000;
+            border: 2px solid #ffffff;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            padding: 0.5rem;
+            text-transform: uppercase;
+            display: inline-block;
+            text-align: center;
+        }
+        button:hover, input:hover, select:hover, a.button-style:hover {
+            background-color: #000000;
+            color: #ffffff;
+            border-color: #ffffff;
+            transition: background-color 0.2s, color 0.2s;
+            cursor: pointer;
+        }
+        nav.desktop-nav a {
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            padding: 0.25rem 0.5rem;
+            border: 2px solid transparent;
+            margin-left: 0.5rem;
+        }
+        nav.desktop-nav a:hover {
+            border: 2px solid #ffffff;
+            background-color: #000000;
+            color: #ffffff;
+        }
+        nav.desktop-nav a.active {
+            border: 2px solid #ffffff;
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .tooltip {
+            position: relative;
+        }
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-4px);
+            background-color: #ffffff;
+            color: #000000;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            white-space: nowrap;
+            z-index: 10;
+            border: 1px solid #000;
+        }
+        .accordion-toggle {
+            background-color: #000000;
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            width: 100%;
+            padding: 0.5rem;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+        .accordion-toggle:hover {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .accordion-content {
+            background-color: #000000;
+        }
+        .grid-background {
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.2) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+            background-size: 20px 20px;
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+        header.sticky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .hamburger {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border: 2px solid #ffffff;
+            background-color: #000000;
+            color: #ffffff;
+        }
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            border: 2px solid #ffffff;
+        }
+        .mobile-nav a {
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            padding: 0.5rem 1rem;
+            border: 2px solid transparent;
+            color: #ffffff;
+            font-size: 1.25rem;
+        }
+        .mobile-nav a:hover, .mobile-nav a.active {
+            border: 2px solid #ffffff;
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .mobile-nav.active {
+            display: flex;
+        }
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border: 2px solid #ffffff;
+            background-color: #000000;
+            color: #ffffff;
+        }
+        @media (max-width: 768px) {
+            nav.desktop-nav {
+                display: none;
+            }
+            .hamburger {
+                display: block;
+            }
+        }
+        body > .flex-1 {
+            flex: 1 1 auto;
+        }
+        #left-tools, #right-tools, #left-settings, #right-actions {
+            top: 5rem;
+            max-height: calc(100vh - 5rem - 4rem);
+        }
+        .main-content-area {
+            padding-top: 1rem;
+            padding-bottom: 5rem;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-screen flex flex-col">
+    <div class="grid-background"></div>
+    <header class="bg-black text-white border-b-2 border-white p-4 sticky">
+        <div class="container mx-auto header-container">
+            <a href="{% url 'index' %}" class="text-3xl font-mono uppercase hover:text-gray-400">CLARIFI</a>
+            <nav class="desktop-nav" aria-label="Main navigation">
+                <a href="{% url 'index' %}" {% if request.resolver_match.url_name == 'index' %}class="active"{% endif %} data-tooltip="Home">HOME</a>
+                <a href="{% url 'studio' %}" {% if request.resolver_match.url_name == 'studio' %}class="active"{% endif %} data-tooltip="Edit Images">STUDIO</a>
+                <a href="{% url 'remove_background' %}" {% if request.resolver_match.url_name == 'remove_background' %}class="active"{% endif %} data-tooltip="Remove Background">REMOVER</a>
+                <a href="{% url 'converter' %}" {% if request.resolver_match.url_name == 'converter' %}class="active"{% endif %} data-tooltip="Convert Images">CONVERTER</a>
+                <a href="{% url 'compressor' %}" {% if request.resolver_match.url_name == 'compressor' %}class="active"{% endif %} data-tooltip="Compress Images">COMPRESSOR</a>
+            </nav>
+            <button class="hamburger" aria-label="Toggle mobile menu">☰</button>
+            <nav class="mobile-nav" aria-label="Mobile navigation">
+                <button class="close-btn" aria-label="Close mobile menu">✖</button>
+                <a href="{% url 'index' %}" {% if request.resolver_match.url_name == 'index' %}class="active"{% endif %}>HOME</a>
+                <a href="{% url 'studio' %}" {% if request.resolver_match.url_name == 'studio' %}class="active"{% endif %}>STUDIO</a>
+                <a href="{% url 'remove_background' %}" {% if request.resolver_match.url_name == 'remove_background' %}class="active"{% endif %}>REMOVER</a>
+                <a href="{% url 'converter' %}" {% if request.resolver_match.url_name == 'converter' %}class="active"{% endif %}>CONVERTER</a>
+                <a href="{% url 'compressor' %}" {% if request.resolver_match.url_name == 'compressor' %}class="active"{% endif %}>COMPRESSOR</a>
+            </nav>
+        </div>
+    </header>
+    <div class="flex-1 relative z-10 main-content-area">
+        {% block content %}
+        {% endblock %}
+    </div>
+    <footer class="bg-black text-white border-t-2 border-white p-4 text-center relative z-20">
+        <p class="font-mono uppercase">CLARIFI 2025 © ALL RIGHTS RESERVED</p>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12/lib/typed.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const hamburger = document.querySelector('.hamburger');
+            const mobileNav = document.querySelector('.mobile-nav');
+            const closeBtn = document.querySelector('.close-btn');
+            hamburger.addEventListener('click', () => {
+                mobileNav.classList.toggle('active');
+            });
+            closeBtn.addEventListener('click', () => {
+                mobileNav.classList.remove('active');
+            });
+            mobileNav.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileNav.classList.remove('active');
+                });
+            });
+        });
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

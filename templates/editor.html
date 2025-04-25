@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% block title %}ClariFi - Batch Editor{% endblock %}
+{% block content %}
+<div class="flex flex-1 overflow-hidden">
+  <!-- Sidebar -->
+  <aside id="sidebar"
+    class="sidebar w-64 md:w-80 p-4 overflow-y-auto md:transform-none sidebar-hidden md:sidebar-visible fixed inset-y-0 left-0 z-20">
+    <h2 class="text-2xl mb-4">BATCH TOOLS</h2>
+    <div class="space-y-4">
+      <!-- Batch Upload -->
+      <div>
+        <label class="block text-sm">UPLOAD IMAGES</label>
+        <div id="dropzone" class="border-2 border-white p-4 text-center cursor-pointer">
+          <p class="text-white">DRAG & DROP OR CLICK</p>
+          <input type="file" id="image-upload" accept="image/*" multiple class="hidden">
+        </div>
+      </div>
+
+      <!-- Batch Operations -->
+      <div>
+        <h3 class="text-xl">OPERATIONS</h3>
+        <div class="space-y-2">
+          <select id="batch-operation" class="p-1 w-full">
+            <option value="grayscale">Grayscale</option>
+            <option value="sepia">Sepia</option>
+            <option value="auto-enhance">Auto Enhance</option>
+            <option value="resize">Resize</option>
+          </select>
+          <div id="batch-params" class="space-y-2"></div>
+          <button id="apply-batch" class="w-full p-2">APPLY BATCH</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Batch Area -->
+  <main class="flex-1 p-4 overflow-auto">
+    <div class="container mx-auto">
+      <div class="border-2 border-white p-6">
+        <h2 class="text-2xl mb-4">BATCH EDITOR</h2>
+        <div id="batch-preview" class="grid grid-cols-3 gap-4"></div>
+        <button id="download-batch" class="w-full p-2 mt-4">DOWNLOAD ALL</button>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const operationSelect = document.getElementById("batch-operation");
+    const paramsDiv = document.getElementById("batch-params");
+
+    operationSelect.addEventListener("change", () => {
+      paramsDiv.innerHTML = "";
+      if (operationSelect.value === "resize") {
+        paramsDiv.innerHTML = `
+                <input type="number" id="resize-width" class="p-1 w-full" placeholder="WIDTH">
+                <input type="number" id="resize-height" class="p-1 w-full" placeholder="HEIGHT">
+            `;
+      }
+    });
+
+    document.getElementById("apply-batch").addEventListener("click", () => {
+      const formData = new FormData();
+      const files = document.getElementById("image-upload").files;
+      for (let file of files) {
+        formData.append("image", file);
+      }
+      formData.append("operation", operationSelect.value);
+      if (operationSelect.value === "resize") {
+        formData.append("width", document.getElementById("resize-width").value);
+        formData.append("height", document.getElementById("resize-height").value);
+      }
+      fetch("/premium/batch_process", {
+        method: "POST",
+        body: formData,
+        headers: {"X-CSRFToken": getCookie("csrftoken")},
+      })
+        .then((response) => response.json())
+        .then((urls) => {
+          const preview = document.getElementById("batch-preview");
+          preview.innerHTML = "";
+          urls.forEach((url) => {
+            const img = document.createElement("img");
+            img.src = url;
+            img.className = "border-2 border-white max-w-full h-auto";
+            preview.appendChild(img);
+          });
+        });
+    });
+
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === name + "=") {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+  });
+</script>

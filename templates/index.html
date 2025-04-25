@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ClariFi{% endblock %}
+
+{% block content %}
+<div class="bg-black text-white py-12 overflow-x-hidden">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 bento-grid">
+            <div class="md:col-span-12 bg-black border-6 border-white p-10 text-center">
+                <h1 class="text-8xl font-mono uppercase tracking-tight shake skew">CLARIFI DELIVERS RAW AI POWER FTW!</h1>
+                <p id="hero-subtitle" class="text-4xl font-mono uppercase mt-6 mb-10 h-12 rotate-2"> </p> <div class="space-y-6 md:space-y-0 md:space-x-6">
+                    <a href="{% url 'studio' %}" class="button-style text-2xl py-4 px-8 border-5 skew inline-block">STUDIO</a>
+                    <a href="{% url 'converter' %}" class="button-style text-2xl py-4 px-8 border-5 skew inline-block">CONVERT</a>
+                    <a href="{% url 'remove_background' %}" class="button-style text-2xl py-4 px-8 border-5 skew inline-block">REMOVE BG</a>
+                    <a href="{% url 'compressor' %}" class="button-style text-2xl py-4 px-8 border-5 skew inline-block">IMAGE COMPRESSOR</a>
+                </div>
+            </div>
+            <div class="md:col-span-3 bg-white text-black border-5 border-black p-8 flex flex-col grid-overlay notched">
+                <h2 class="text-3xl font-mono text-black uppercase mb-4">STUDIO</h2>
+                <p class="font-mono mb-6 flex-grow text-lg">BRIGHTNESS. CONTRAST. FILTERS. CROP. RESIZE. RAW POWER, NO CHAINS.</p>
+                <a href="{% url 'studio' %}" class="button-style mt-auto text-lg py-2 px-4 border-3 faceted-button">LAUNCH</a>
+            </div>
+            <div class="md:col-span-3 bg-white text-black border-5 border-black p-8 flex flex-col grid-overlay notched">
+                <h2 class="text-3xl font-mono uppercase text-black mb-4">BG REMOVER</h2>
+                <p class="font-mono mb-6 flex-grow text-lg">ONE CLICK. BACKGROUND GONE. PNG OUTPUT. BRUTAL SPEED.</p>
+                <a href="{% url 'remove_background' %}" class="button-style mt-auto text-lg py-2 px-4 border-3 faceted-button">TRY IT</a>
+            </div>
+            <div class="md:col-span-3 bg-white text-black border-5 border-black p-8 flex flex-col grid-overlay notched">
+                <h2 class="text-3xl font-mono uppercase text-black mb-4">CONVERTER</h2>
+                <p class="font-mono mb-6 flex-grow text-lg">JPEG. PNG. WEBP. GIF. FORMAT FREEDOM. BATCH SOON.</p>
+                <a href="{% url 'converter' %}" class="button-style mt-auto text-lg py-2 px-4 border-3 faceted-button">CONVERT</a>
+            </div>
+            <div class="md:col-span-3 bg-white text-black border-5 border-black p-8 flex flex-col grid-overlay notched">
+                <h2 class="text-3xl font-mono uppercase text-black mb-4">COMPRESSOR</h2>
+                <p class="font-mono mb-6 flex-grow text-lg">COMPRESS ANY IMAGE TYPE. JPEG. PNG. WEBP. GIF. COMPRESS WITH FREEDOM.</p>
+                <a href="{% url 'compressor' %}" class="button-style mt-auto text-lg py-2 px-4 border-3 faceted-button">COMPRESSOR</a>
+            </div>
+
+            <div class="md:col-span-12 bg-black border-6 border-white p-10 text-center grid-overlay notched">
+                <h2 class="text-4xl font-mono uppercase mb-6">MANIFESTO</h2>
+                <p class="font-mono text-xl max-w-3xl uppercase mx-auto">CLARIFI IS OPEN SOURCE. NO SUITS. NO WALLS. USE CLARIFI for image editings without limitations.</p>
+            </div>
+
+            <div class="md:col-span-6 bg-white text-black border-5 border-black p-8 grid-overlay">
+                <h2 class="text-3xl font-mono uppercase mb-6">CREATOR’S VISION</h2>
+                <p class="font-mono text-lg mb-6 uppercase">ClariFi is designed to provide powerful, accessible image processing tools for everyone to do quick editins regardless of any monetary interests.</p>
+                <a href="https://linkedin.com/company/aiforgoodinitiative/" class="button-style text-lg py-2 px-4 border-3 faceted-button">CONTACT US ON LINKEDIN</a>
+            </div>
+            <div class="md:col-span-6 bg-black text-white border-5 border-white p-8 grid-overlay-large">
+                <h2 class="text-3xl font-mono uppercase mb-6">IMPACT FORGE</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="border-4 border-white p-6 text-center scanline">
+                        <p class="text-4xl font-mono">400+</p>
+                        <p class="font-mono uppercase">IMAGES PROCESSED</p>
+                    </div>
+                    <div class="border-4 border-white p-6 text-center scanline">
+                        <p class="text-4xl font-mono">50+</p>
+                        <p class="font-mono uppercase">PEOPLE</p>
+                    </div>
+                    <div class="border-4 border-white p-6 text-center scanline">
+                        <p class="text-4xl font-mono">100%</p>
+                        <p class="font-mono uppercase">OPENSOURCE</p>
+                    </div>
+                    <div class="border-4 border-white p-6 text-center scanline">
+                        <p class="text-4xl font-mono">2025</p>
+                        <p class="font-mono uppercase">BORN</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:col-span-6 bg-black text-white border-5 border-white p-8 grid-overlay">
+                <h2 class="text-3xl font-mono uppercase mb-6">YOUR VOICES</h2>
+                <div class="space-y-4">
+                    <div class="border-4 border-white p-6">
+                        <p class="font-mono text-lg uppercase">"The converter tool is incredibly fast and reliable. It’s become a staple in my workflow."</p>
+                        <p class="font-mono mt-4 uppercase text-right">— J.K., DESIGNER</p>
+                    </div>
+                    <div class="border-4 border-white p-6">
+                        <p class="font-mono text-lg uppercase">"Studio’s intuitive interface made editing images a breeze. Highly recommend!"</p>
+                        <p class="font-mono mt-4 uppercase text-right">— A.P., SCRIBE</p>
+                    </div>
+                </div>
+            </div>
+            <div class="md:col-span-6 bg-white text-black border-5 border-black p-8 grid-overlay">
+                <h2 class="text-3xl font-mono uppercase mb-6">CHAOS LAB</h2>
+                <p class="font-mono text-lg mb-6 uppercase">We’re working on new features like AI sharpening, advanced filters, and batch processing. Want to contribute? Reach out!</p>
+                <a href="https://linkedin.com/company/aiforgoodinitiative/" class="button-style text-lg py-2 px-4 border-3 faceted-button">GET INVOLVED</a>
+            </div>
+
+            <div class="md:col-span-12 bg-black border-6 border-white p-10 text-center grid-overlay notched">
+                <h2 class="text-4xl font-mono uppercase mb-6">SUPPORT US?</h2>
+                <p class="font-mono text-xl mb-6 max-w-2xl mx-auto">TO SUPPORT CLARIFI IS AS EASY AS USING IT. SHARE CLARIFI WITH YOUR FRIENDS AND PEOPLE YOU LOVE TO SUPPORT US IN GAIGING RECOGNITION!</p>
+            </div>
+
+            <div class="md:col-span-12 bg-black border-6 border-white p-10 text-center grid-overlay-large">
+                <h2 class="text-4xl font-mono uppercase mb-6">START CREATING TODAY</h2>
+                <div class="space-y-4 md:space-y-0 md:space-x-4">
+                    <a href="{% url 'studio' %}" class="button-style text-xl py-3 px-6 border-4 faceted-button">STUDIO</a>
+                    <a href="{% url 'converter' %}" class="button-style text-xl py-3 px-6 border-4 faceted-button">CONVERT</a>
+                    <a href="{% url 'remove_background' %}" class="button-style text-xl py-3 px-6 border-4 faceted-button">REMOVE BG</a>
+                    <a href="{% url 'compressor' %}" class="button-style text-xl py-3 px-6 border-4 faceted-button">COMPRESS</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+.bento-grid {
+    display: grid;
+    grid-template-rows: auto;
+    gap: 1.5rem;
+}
+.grid-overlay {
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.2) 2px, transparent 2px),
+                      linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 2px, transparent 2px);
+    background-size: 20px 20px;
+}
+.grid-overlay-large {
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.2) 2px, transparent 2px),
+                      linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 2px, transparent 2px);
+    background-size: 40px 40px;
+}
+.notched {
+    position: relative;
+    clip-path: polygon(
+        0% 10px, 10px 0%, calc(100% - 10px) 0%, 100% 10px,
+        100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px)
+    );
+}
+.faceted-button {
+    clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
+    transition: transform 0.2s;
+}
+.faceted-button:hover {
+    transform: scale(1.05);
+}
+.geometric-title {
+    position: relative;
+    display: inline-block;
+}
+.geometric-title::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border: 4px solid white;
+    clip-path: polygon(0% 10%, 10% 0%, 90% 0%, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0% 90%);
+    z-index: -1;
+}
+.scanline {
+    animation: scanline 3s infinite linear;
+}
+@keyframes scanline {
+    0% { background: linear-gradient(to bottom, transparent 50%, rgba(255, 255, 255, 0.1) 50%); }
+    100% { background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 50%, transparent 50%); }
+}
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.getElementById("hero-subtitle")) {
+        new Typed("#hero-subtitle", {
+            strings: ["FORGE. BREAK. CREATE.", "OPEN. RAW. FREE.", "YOUR TOOLS. OUR FIRE."],
+            typeSpeed: 50,
+            backSpeed: 30,
+            loop: true,
+            showCursor: false,
+        });
+    }
+    document.querySelectorAll('.accordion-toggle').forEach(button => {
+        button.addEventListener('click', () => {
+            const content = button.nextElementSibling;
+            button.classList.toggle('active');
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        });
+        button.nextElementSibling.style.display = 'none';
+    });
+});
+</script>
+{% endblock %}

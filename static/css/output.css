@@ -1,0 +1,233 @@
+/* Brutalist overrides for Tailwind */
+/* Add or verify these styles */
+
+body {
+  /* padding-top might be better handled in base.html <style> */
+}
+
+/* Ensure consistency for all button-like elements */
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+a.button-style {
+  /* Target anchor tags styled as buttons */
+  background-color: #ffffff;
+  color: #000000;
+  border: 2px solid #ffffff;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  /* Ensure font size consistency */
+  padding: 0.5rem 1rem;
+  /* Standardize padding */
+  text-transform: uppercase;
+  border-radius: 0 !important;
+  display: inline-block;
+  /* Ensure proper layout */
+  text-align: center;
+  transition: background-color 0.2s, color 0.2s;
+  cursor: pointer;
+}
+
+button:hover,
+input[type="button"]:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover,
+a.button-style:hover {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+/* Input fields */
+input[type="text"],
+input[type="number"],
+input[type="file"],
+select,
+textarea {
+  background-color: #ffffff;
+  color: #000000;
+  border: 2px solid #ffffff;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  padding: 0.5rem;
+  text-transform: uppercase;
+  /* Often desired for Brutalism */
+  border-radius: 0 !important;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="file"]:focus,
+/* Might not show focus visually */
+select:focus,
+textarea:focus {
+  outline: 2px solid #ffffff;
+  /* Simple focus outline */
+  outline-offset: 1px;
+  background-color: #111;
+  /* Darken slightly on focus */
+  color: #ffffff;
+}
+
+
+/* Range input styling (moved slider specifics to studio.html <style>) */
+input[type="range"] {
+  /* Basic appearance reset if needed */
+  /* -webkit-appearance: none; */
+  /* appearance: none; */
+  /* width: 100%; */
+  /* background: transparent; */
+  /* cursor: pointer; */
+}
+
+canvas {
+  border: 2px solid white;
+  display: block;
+  /* Prevents extra space below canvas */
+  max-width: 100%;
+  /* Ensure responsiveness */
+  height: auto;
+  /* Maintain aspect ratio */
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Helvetica', sans-serif;
+  /* Or your preferred bold sans-serif */
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #ffffff;
+  /* Ensure color */
+}
+
+.tooltip:hover::after {
+  border-radius: 0;
+  font-family: 'Courier New', monospace;
+  /* Consistency */
+  text-transform: uppercase;
+}
+
+.backdrop-blur-md {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.accordion-content {
+  border: 2px solid white;
+  border-top: none;
+  /* Avoid double border with toggle button */
+  padding: 0.5rem;
+  /* Ensure padding */
+  /* display: none; /* Handled by JS/inline style */
+}
+
+/* Upload prompt styling */
+#upload-prompt,
+#upload-prompt-studio {
+  background-color: rgba(0, 0, 0, 0.8);
+  border: 2px solid #ffffff;
+  /* Ensure border */
+  color: #ffffff;
+  /* Ensure text color */
+}
+
+/* Tool Panels */
+#left-tools,
+#right-tools,
+#left-settings,
+#right-actions {
+  background-color: #000000;
+  /* top: 5rem; /* Adjust based on final header height */
+  /* max-height: calc(100vh - 5rem - 4rem); /* Adjust based on header/footer */
+}
+
+/* CSS Cube (Keep as is) */
+.cube-container {
+  /* ... */
+}
+
+.cube {
+  /* ... */
+}
+
+.face {
+  /* ... */
+}
+
+.front {
+  /* ... */
+}
+
+/* etc. */
+
+/* Disabled button styles */
+button:disabled,
+.opacity-50 {
+  /* Target opacity class as well */
+  background-color: #4b4b4b !important;
+  /* Dark gray */
+  color: #999999 !important;
+  /* Lighter gray text */
+  border-color: #666666 !important;
+  /* Dull border */
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
+  /* Apply opacity */
+}
+
+/* Tooltips on disabled items should still work */
+.opacity-50.tooltip:hover::after {
+  /* Keep tooltip styles */
+}
+
+/* Optional: Checkerboard for transparent backgrounds */
+.checkerboard-bg {
+  background-image: linear-gradient(45deg, #444 25%, transparent 25%), linear-gradient(-45deg, #444 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #444 75%), linear-gradient(-45deg, transparent 75%, #444 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  background-color: #222;
+  /* Fallback */
+}
+
+
+/* Scrollbar container */
+::-webkit-scrollbar {
+  width: 16px;
+  /* Width of the vertical scrollbar */
+  height: 16px;
+  /* Height of the horizontal scrollbar */
+}
+
+/* Track (background of the scrollbar) */
+::-webkit-scrollbar-track {
+  background: white;
+  /* White background */
+  border-left: 2px solid black;
+  /* Thick black border on the left */
+}
+
+/* Thumb (the draggable part of the scrollbar) */
+::-webkit-scrollbar-thumb {
+  background: black;
+  /* Black thumb */
+  border: 2px solid white;
+  /* White border around the thumb */
+  border-radius: 0;
+  /* Sharp edges (no rounding) */
+}
+
+/* Hover effect for the thumb */
+::-webkit-scrollbar-thumb:hover {
+  background: #333;
+  /* Slightly darker black on hover */
+}
+
+/* Firefox-specific scrollbar styles */
+* {
+  scrollbar-width: thin;
+  /* Thin scrollbar */
+  scrollbar-color: black white;
+  /* Black thumb, white track */
+}

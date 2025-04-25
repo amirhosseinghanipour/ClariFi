@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}ClariFi Compressor{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/compressor.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="relative">
+  <button id="left-settings-toggle"
+    class="md:hidden fixed left-0 top-1/2 transform -translate-y-1/2 bg-black text-white p-2 z-30 border-r-2 border-white">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+    </svg>
+  </button>
+  <button id="right-actions-toggle"
+    class="md:hidden fixed right-0 top-1/2 transform -translate-y-1/2 bg-black text-white p-2 z-30 border-l-2 border-white">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+    </svg>
+  </button>
+
+  <div id="drag-overlay"
+    class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center hidden z-50">
+    <p class="text-4xl font-mono uppercase text-white text-center">DROP ANYWHERE TO UPLOAD THE IMAGE</p>
+  </div>
+
+  <aside id="left-settings"
+    class="fixed mt-20 md:mt-0 left-0 top-0 w-64 h-full overflow-y-auto bg-black border-r-2 border-white p-4 z-20 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+    <button class="md:hidden absolute top-2 right-2 text-black hover:text-white">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <h2 class="text-2xl mb-4 font-mono uppercase">SETTINGS</h2>
+    <div class="space-y-4">
+      <div class="accordion">
+        <button class="accordion-toggle">UPLOAD</button>
+        <div class="accordion-content space-y-2 p-2">
+          <div id="upload-prompt"
+            class="relative flex items-center justify-center h-32 bg-black bg-opacity-80 border-2 border-white cursor-pointer">
+            <p class="text-xl font-mono uppercase text-center text-white">CLICK OR DRAG IMAGE</p>
+            <input type="file" id="image-upload" accept="image/*" class="hidden">
+          </div>
+          <p id="upload-feedback" class="text-sm text-gray-400 font-mono uppercase hidden"></p>
+          <button id="clear-image" class="w-full p-2 font-mono uppercase">CLEAR IMAGE</button>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <button
+          class="accordion-toggle w-full p-2 text-left bg-black border-2 border-white text-lg font-mono uppercase">COMPRESSION</button>
+        <div class="accordion-content space-y-2 p-2">
+          <div>
+            <label class="text-sm font-mono uppercase">FORMAT</label>
+            <select id="format-select" class="w-full p-2">
+              <option value="jpeg">JPEG</option>
+              <option value="png">PNG</option>
+              <option value="webp">WEBP</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-sm font-mono uppercase">QUALITY (JPEG/WEBP)</label>
+            <input type="range" id="quality-slider" min="1" max="100" value="80" class="w-full slider">
+            <span id="quality-value" class="text-sm font-mono uppercase">80%</span>
+          </div>
+          <div>
+            <label class="text-sm font-mono uppercase">COMPRESSION LEVEL (PNG)</label>
+            <input type="range" id="compression-slider" min="0" max="9" value="6" class="w-full slider">
+            <span id="compression-value" class="text-sm font-mono uppercase">6</span>
+          </div>
+          <div>
+            <label class="text-sm font-mono uppercase">TARGET SIZE (KB)</label>
+            <input type="number" id="target-size" class="w-full p-2" min="1" value="100">
+          </div>
+          <div>
+            <label class="flex gap-2 items-center text-sm font-mono uppercase">
+              <input type="checkbox" id="lossless"> LOSSLESS (WEBP/PNG)
+            </label>
+          </div>
+          <div>
+            <label class="flex gap-2 items-center text-sm font-mono uppercase">
+              <input type="checkbox" id="progressive"> PROGRESSIVE (JPEG)
+            </label>
+          </div>
+          <div>
+            <label class="flex gap-2 items-center text-sm font-mono uppercase">
+              <input type="checkbox" id="strip-metadata"> STRIP METADATA
+            </label>
+          </div>
+          <div>
+            <label class="text-sm font-mono uppercase">QUANTIZATION</label>
+            <select id="quantization" class="w-full p-2">
+              <option value="standard">Standard</option>
+              <option value="high">High</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <aside id="right-actions"
+    class="fixed mt-20 md:mt-0 right-0 top-0 w-64 h-full overflow-y-auto bg-black border-l-2 border-white p-4 z-20 transform translate-x-full md:translate-x-0 transition-transform duration-300">
+    <button class="md:hidden absolute top-2 right-2 text-black hover:text-white">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <h2 class="text-2xl mb-4 font-mono uppercase">ACTIONS</h2>
+    <div class="space-y-4">
+      <button id="compress-button"
+        class="w-full p-2 bg-white text-black border-2 border-white hover:bg-black hover:text-white font-mono uppercase">COMPRESS</button>
+      <button id="download-button"
+        class="w-full p-2 bg-white text-black border-2 border-white hover:bg-black hover:text-white font-mono uppercase">DOWNLOAD</button>
+    </div>
+  </aside>
+
+  <main class="flex-1 p-4 md:mx-64">
+    <div class="container mx-auto">
+      <h1 class="text-4xl font-mono uppercase mb-6 text-center">IMAGE COMPRESSOR</h1>
+      <div class="border-2 border-white p-6 overflow-auto">
+        <h2 class="text-2xl mb-4 font-mono uppercase">PREVIEW</h2>
+        <div id="canvas-area" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h3 class="text-lg font-mono uppercase mb-2">ORIGINAL</h3>
+            <canvas id="original-canvas" width="0" height="0" class="border-2 border-white max-w-full h-auto"></canvas>
+            <p id="original-size" class="text-sm font-mono uppercase mt-2">SIZE: -- KB</p>
+          </div>
+          <div>
+            <h3 class="text-lg font-mono uppercase mb-2">COMPRESSED</h3>
+            <canvas id="compressed-canvas" width="0" height="0"
+              class="border-2 border-white max-w-full h-auto"></canvas>
+            <p id="compressed-size" class="text-sm font-mono uppercase mt-2">SIZE: -- KB</p>
+          </div>
+        </div>
+        <div id="no-image-placeholder" class="text-center font-mono uppercase text-gray-500 py-10">
+          UPLOAD AN IMAGE TO START
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.querySelectorAll('.accordion-toggle').forEach(button => {
+    button.addEventListener('click', () => {
+      const content = button.nextElementSibling;
+      content.style.display = content.style.display === 'block' ? 'none' : 'block';
+    });
+    if (button.textContent === 'UPLOAD' || button.textContent === 'COMPRESSION') {
+      button.nextElementSibling.style.display = 'block';
+    }
+  });
+
+  document.getElementById('left-settings-toggle').addEventListener('click', () => {
+    const leftSettings = document.getElementById('left-settings');
+    leftSettings.classList.toggle('-translate-x-full');
+  });
+
+  document.getElementById('right-actions-toggle').addEventListener('click', () => {
+    const rightActions = document.getElementById('right-actions');
+    rightActions.classList.toggle('translate-x-full');
+  });
+
+  document.querySelectorAll('#left-settings button, #right-actions button').forEach(button => {
+    if (button.innerHTML.includes('M6 18L18 6M6 6l12 12')) {
+      button.addEventListener('click', () => {
+        const sidebar = button.closest('aside');
+        if (sidebar.id === 'left-settings') {
+          sidebar.classList.add('-translate-x-full');
+        } else {
+          sidebar.classList.add('translate-x-full');
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+  .slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: #ffffff;
+    outline: none;
+    opacity: 0.9;
+    transition: opacity 0.2s;
+    border: 1px solid #ffffff;
+  }
+
+  .slider:hover {
+    opacity: 1;
+  }
+
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #ffffff;
+    border: 2px solid #000000;
+    cursor: pointer;
+  }
+
+  .slider::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    background: #ffffff;
+    border: 2px solid #000000;
+    cursor: pointer;
+    border-radius: 0;
+  }
+
+  input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid black;
+    background-color: white;
+    outline: none;
+    cursor: pointer;
+    position: relative;
+  }
+
+  input[type="checkbox"]:checked {
+    background-color: white;
+  }
+
+  input[type="checkbox"]:checked::after {
+    content: "✔";
+    font-size: 16px;
+    color: black;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+  }
+
+  @media (max-width: 767px) {
+
+    #left-settings,
+    #right-actions {
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    #left-settings-toggle,
+    #right-actions-toggle {
+      z-index: 40;
+    }
+  }
+</style>
+{% endblock %}

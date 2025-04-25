@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ClariFi Background Remover{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/remover.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="relative">
+    <button id="left-settings-toggle" class="md:hidden fixed left-0 top-1/2 transform -translate-y-1/2 bg-black text-white p-2 z-30 border-r-2 border-white">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+        </svg>
+    </button>
+    <button id="right-actions-toggle" class="md:hidden fixed right-0 top-1/2 transform -translate-y-1/2 bg-black text-white p-2 z-30 border-l-2 border-white">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+        </svg>
+    </button>
+
+    <div id="drag-overlay" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center hidden z-50">
+        <p class="text-4xl font-mono uppercase text-white text-center">DROP ANYWHERE TO UPLOAD THE IMAGE</p>
+    </div>
+
+    <aside id="left-settings" class="fixed left-0 mt-20 md:mt-0 w-64 h-full overflow-y-auto bg-black border-r-2 border-white p-4 z-20 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+        <button class="md:hidden absolute top-2 right-2 text-black hover:text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <h2 class="text-2xl mb-4 font-mono uppercase">SETTINGS</h2>
+        <div class="space-y-4">
+            <div class="accordion">
+                <button class="accordion-toggle">UPLOAD</button>
+                <div class="accordion-content space-y-2 p-2" style="display: block;"> 
+                    <div id="upload-prompt" class="relative flex items-center justify-center h-32 bg-black bg-opacity-80 border-2 border-white cursor-pointer">
+                        <p class="text-xl font-mono uppercase text-white text-center p-2">CLICK OR DRAG IMAGE</p>
+                        <input type="file" id="image-upload" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                    </div>
+                    <p id="upload-feedback" class="text-sm text-gray-400 font-mono uppercase" style="display: none;"></p>
+                    <button id="clear-image" class="button-style w-full">CLEAR IMAGE</button>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <aside id="right-actions" class="fixed right-0 mt-20 md:mt-0 w-64 h-full overflow-y-auto bg-black border-l-2 border-white p-4 z-20 transform translate-x-full md:translate-x-0 transition-transform duration-300">
+        <button class="md:hidden absolute top-2 right-2 text-black hover:text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <h2 class="text-2xl mb-4 font-mono uppercase">ACTIONS</h2>
+        <div class="space-y-4">
+            <button id="remove-bg" class="button-style w-full">REMOVE BG</button>
+            <button id="download" class="button-style w-full">DOWNLOAD</button>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-4 md:mx-64">
+        <div class="container mx-auto">
+            <h1 class="text-4xl font-mono uppercase mb-6 text-center">BACKGROUND REMOVER</h1>
+            <div class="border-2 border-white p-6 overflow-auto">
+                <h2 class="text-2xl mb-4 font-mono uppercase">PREVIEW</h2>
+                <div id="canvas-area" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="text-lg font-mono uppercase mb-2">ORIGINAL</h3>
+                        <canvas id="original-canvas" width="0" height="0" class="border-2 border-white max-w-full h-auto"></canvas>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-mono uppercase mb-2">RESULT</h3>
+                        <canvas id="removed-canvas" width="0" height="0" class="border-2 border-white max-w-full h-auto"></canvas>
+                    </div>
+                </div>
+                <div id="no-image-placeholder" class="text-center font-mono uppercase text-gray-500 py-10">
+                    UPLOAD AN IMAGE TO START
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.querySelectorAll('.accordion-toggle').forEach(button => {
+        button.addEventListener('click', () => {
+            const content = button.nextElementSibling;
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        });
+        if (button.textContent === 'UPLOAD') {
+            button.nextElementSibling.style.display = 'block';
+        }
+    });
+
+    // Mobile sidebar toggle functionality
+    document.getElementById('left-settings-toggle').addEventListener('click', () => {
+        const leftSettings = document.getElementById('left-settings');
+        leftSettings.classList.toggle('-translate-x-full');
+    });
+
+    document.getElementById('right-actions-toggle').addEventListener('click', () => {
+        const rightActions = document.getElementById('right-actions');
+        rightActions.classList.toggle('translate-x-full');
+    });
+
+    // Close buttons inside the sidebars
+    document.querySelectorAll('#left-settings button, #right-actions button').forEach(button => {
+        if (button.innerHTML.includes('M6 18L18 6M6 6l12 12')) {
+            button.addEventListener('click', () => {
+                const sidebar = button.closest('aside');
+                if (sidebar.id === 'left-settings') {
+                    sidebar.classList.add('-translate-x-full');
+                } else {
+                    sidebar.classList.add('translate-x-full');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    .checkerboard-bg {
+        background-image: linear-gradient(45deg, #444 25%, transparent 25%), linear-gradient(-45deg, #444 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #444 75%), linear-gradient(-45deg, transparent 75%, #444 75%);
+        background-size: 20px 20px;
+        background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        background-color: #222;
+    }
+    @media (max-width: 767px) {
+        #left-settings, #right-actions {
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        #left-settings-toggle, #right-actions-toggle {
+            z-index: 40;
+        }
+    }
+</style>
+{% endblock %}
