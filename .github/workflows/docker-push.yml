@@ -17,9 +17,9 @@ name: Build and Push Docker Image
             username: ${{ secrets.DOCKERHUB_USERNAME }}
             password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-         - name: Build and push Docker image
-            uses: docker/build-push-action@v6
-            with:
-              context: .
-              push: true
-              tags: amirhosseinghanipour/clarifi:latest
+        - name: Build and push Docker image
+          uses: docker/build-push-action@v6
+          with:
+            context: .
+            push: true
+            tags: amirhosseinghanipour/clarifi:latest
