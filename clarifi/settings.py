@@ -33,13 +33,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# Async settings
-ASGI_APPLICATION = "clarifi.asgi.application"
-
-# Thread pool settings for async operations
-ASYNC_THREAD_POOL_SIZE = 8
-ASYNC_PROCESS_POOL_SIZE = 4
-
 ROOT_URLCONF = "clarifi.urls"
 
 TEMPLATES = [

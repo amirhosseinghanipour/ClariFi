@@ -14,5 +14,3 @@ requests==2.32.3
 scipy==1.15.2
 sqlparse==0.5.3
 urllib3==2.4.0
-asyncio
-aiofiles==24.1.0

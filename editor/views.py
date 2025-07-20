@@ -1,24 +1,16 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
-from asgiref.sync import sync_to_async
-import asyncio
 from .utils.image_processing import ImageProcessor
-from .utils.async_image_processing import AsyncImageProcessor, BatchAsyncProcessor
 import uuid
 import os
 import mimetypes
 from django.conf import settings
 import logging
-from concurrent.futures import ThreadPoolExecutor
-import json
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Global thread pool for async operations
-thread_pool = ThreadPoolExecutor(max_workers=8)
 
 def index(request):
     return render(request, "index.html")
@@ -80,205 +72,141 @@ def get_studio_image(request):
 
 
 @csrf_exempt
-@require_http_methods(["POST"])
 def adjust_image(request, tool):
-    async def process_adjustment():
+    if request.method == "POST" and request.FILES.get("image"):
         image = request.FILES["image"]
         factor = float(request.POST.get("factor", 1.0))
         if not 0 <= factor <= 2:
             logger.error("Invalid factor: %s", factor)
             return JsonResponse({"error": "Factor must be between 0 and 2"}, status=400)
-        
         try:
-            processor = AsyncImageProcessor(image)
+            processor = ImageProcessor(image)
             if tool == "brightness":
-                await processor.adjust_brightness_async(factor)
+                processor.adjust_brightness(factor)
             elif tool == "contrast":
-                await processor.adjust_contrast_async(factor)
+                processor.adjust_contrast(factor)
             elif tool == "saturation":
-                await processor.adjust_saturation_async(factor)
+                processor.adjust_saturation(factor)
             elif tool == "hue":
-                await processor.adjust_hue_async(factor)
+                processor.adjust_hue(factor)
             else:
                 return JsonResponse({"error": "Invalid tool"}, status=400)
-            
-            processed = await processor.save_image_async()
+            processed = processor.save_image()
             logger.info("Adjusted image: %s with factor %s", tool, factor)
             return HttpResponse(processed, content_type="image/png")
         except Exception as e:
             logger.error("Adjust image error: %s", str(e))
             return JsonResponse({"error": str(e)}, status=500)
-    
-    if request.FILES.get("image"):
-        return asyncio.run(process_adjustment())
-    else:
-        logger.error("Invalid adjust request")
-        return JsonResponse({"error": "Invalid request"}, status=400)
+    logger.error("Invalid adjust request")
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 
 @csrf_exempt
-@require_http_methods(["POST"])
 def filter_image(request, tool):
-    async def process_filter():
+    if request.method == "POST" and request.FILES.get("image"):
         image = request.FILES["image"]
         radius = float(request.POST.get("radius", 2.0)
                        ) if tool == "blur" else None
         intensity = float(request.POST.get("intensity", 0.5)) if tool in [
             "vignette", "noise"] else None
-        
         if radius is not None and not 0 <= radius <= 10:
             logger.error("Invalid radius: %s", radius)
             return JsonResponse({"error": "Radius must be between 0 and 10"}, status=400)
         if intensity is not None and not 0 <= intensity <= 1:
             logger.error("Invalid intensity: %s", intensity)
             return JsonResponse({"error": "Intensity must be between 0 and 1"}, status=400)
-        
         try:
-            processor = AsyncImageProcessor(image)
-            
-            # Prepare parameters for the filter
-            params = {}
-            if radius is not None:
-                params['radius'] = radius
-            if intensity is not None:
-                params['intensity'] = intensity
-            
-            # Apply filter asynchronously
-            await processor.apply_filter_async(tool, **params)
-            
-            if tool not in ["grayscale", "sepia", "blur", "sharpen", "edge_detection", 
-                           "vignette", "noise", "hdr", "cartoon", "oil_painting", 
-                           "watercolor", "sketch", "emboss"]:
+            processor = ImageProcessor(image)
+            if tool == "grayscale":
+                processor.grayscale()
+            elif tool == "sepia":
+                processor.sepia()
+            elif tool == "blur":
+                processor.blur(radius)
+            elif tool == "sharpen":
+                processor.sharpen()
+            elif tool == "edge_detection":
+                processor.edge_detection()
+            elif tool == "vignette":
+                processor.vignette(intensity)
+            elif tool == "noise":
+                processor.noise(intensity)
+            elif tool == "hdr":
+                processor.hdr()
+            elif tool == "cartoon":
+                processor.cartoon()
+            elif tool == "oil_painting":
+                processor.oil_painting()
+            elif tool == "watercolor":
+                processor.watercolor()
+            elif tool == "sketch":
+                processor.sketch()
+            elif tool == "emboss":
+                processor.emboss()
+            else:
                 return JsonResponse({"error": "Invalid tool"}, status=400)
-            
-            processed = await processor.save_image_async()
+            processed = processor.save_image()
             logger.info("Filtered image: %s", tool)
             return HttpResponse(processed, content_type="image/png")
         except Exception as e:
             logger.error("Filter image error: %s", str(e))
             return JsonResponse({"error": str(e)}, status=500)
-    
-    if request.FILES.get("image"):
-        return asyncio.run(process_filter())
-    else:
-        logger.error("Invalid filter request")
-        return JsonResponse({"error": "Invalid request"}, status=400)
+    logger.error("Invalid filter request")
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 
 @csrf_exempt
-@require_http_methods(["POST"])
 def transform_image(request, tool):
-    async def process_transform():
+    if request.method == "POST" and request.FILES.get("image"):
         image = request.FILES["image"]
+        params = {}
         try:
-            processor = AsyncImageProcessor(image)
+            processor = ImageProcessor(image)
             if tool == "apply-crop":
-                left = int(request.POST.get("left", 0))
-                top = int(request.POST.get("top", 0))
-                right = int(request.POST.get("right", 0))
-                bottom = int(request.POST.get("bottom", 0))
-                
-                if any(v < 0 for v in [left, top, right, bottom]):
+                params = {
+                    "left": int(request.POST.get("left", 0)),
+                    "top": int(request.POST.get("top", 0)),
+                    "right": int(request.POST.get("right", 0)),
+                    "bottom": int(request.POST.get("bottom", 0)),
+                }
+                if any(v < 0 for v in params.values()):
                     return JsonResponse({"error": "Crop values must be non-negative"}, status=400)
-                
-                await processor.crop_async(left, top, right, bottom)
+                processor.crop(**params)
             elif tool == "apply-resize":
-                width = int(request.POST.get("width", 0))
-                height = int(request.POST.get("height", 0))
-                
-                if width <= 0 or height <= 0:
+                params = {
+                    "width": int(request.POST.get("width", 0)),
+                    "height": int(request.POST.get("height", 0)),
+                }
+                if params["width"] <= 0 or params["height"] <= 0:
                     return JsonResponse({"error": "Width and height must be positive"}, status=400)
-                
-                await processor.resize_async(width, height)
+                processor.resize(**params)
             elif tool == "rotate":
                 angle = int(request.POST.get("angle", 0))
                 if angle not in [90, 180, 270]:
                     return JsonResponse({"error": "Angle must be 90, 180, or 270"}, status=400)
-                
-                # For rotate and flip, we'll use the sync processor for now
-                sync_processor = ImageProcessor(image)
-                sync_processor.rotate(angle)
-                processed = sync_processor.save_image()
-                logger.info("Transformed image: %s", tool)
-                return HttpResponse(processed, content_type="image/png")
+                processor.rotate(angle)
             elif tool == "flip":
                 direction = request.POST.get("direction", "horizontal")
                 if direction not in ["horizontal", "vertical"]:
                     return JsonResponse({"error": "Direction must be horizontal or vertical"}, status=400)
-                
-                # For rotate and flip, we'll use the sync processor for now
-                sync_processor = ImageProcessor(image)
-                sync_processor.flip(direction)
-                processed = sync_processor.save_image()
-                logger.info("Transformed image: %s", tool)
-                return HttpResponse(processed, content_type="image/png")
+                processor.flip(direction)
             else:
                 return JsonResponse({"error": "Invalid tool"}, status=400)
-            
-            processed = await processor.save_image_async()
-            logger.info("Transformed image: %s", tool)
+            processed = processor.save_image()
+            logger.info("Transformed image: %s with params %s", tool, params)
             return HttpResponse(processed, content_type="image/png")
         except Exception as e:
             logger.error("Transform image error: %s", str(e))
             return JsonResponse({"error": str(e)}, status=500)
-    
-    if request.FILES.get("image"):
-        return asyncio.run(process_transform())
-    else:
-        logger.error("Invalid transform request")
-        return JsonResponse({"error": "Invalid request"}, status=400)
+    logger.error("Invalid transform request")
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 
 @csrf_exempt
-@require_http_methods(["POST"])
 def premium(request, tool):
-    async def process_premium():
+    if request.method == "POST" and request.FILES.get("image"):
         try:
-            image = request.FILES["image"]
-            
-            # For CPU-intensive operations, use async processor
-            if tool in ["remove-background", "super-resolution", "auto-enhance", "colorize", "restore"]:
-                processor = AsyncImageProcessor(image)
-                
-                if tool == "remove-background":
-                    await processor.remove_background_async()
-                elif tool == "super-resolution":
-                    scale = int(request.POST.get("scale", 2))
-                    # Use sync processor for complex operations that aren't async yet
-                    sync_processor = ImageProcessor(image)
-                    sync_processor.super_resolution(scale)
-                    processed = sync_processor.save_image()
-                    logger.info("Premium tool applied: %s", tool)
-                    return HttpResponse(processed, content_type="image/png")
-                elif tool == "auto-enhance":
-                    # Use sync processor for complex operations that aren't async yet
-                    sync_processor = ImageProcessor(image)
-                    sync_processor.auto_enhance()
-                    processed = sync_processor.save_image()
-                    logger.info("Premium tool applied: %s", tool)
-                    return HttpResponse(processed, content_type="image/png")
-                elif tool == "colorize":
-                    # Use sync processor for complex operations that aren't async yet
-                    sync_processor = ImageProcessor(image)
-                    sync_processor.colorize()
-                    processed = sync_processor.save_image()
-                    logger.info("Premium tool applied: %s", tool)
-                    return HttpResponse(processed, content_type="image/png")
-                elif tool == "restore":
-                    # Use sync processor for complex operations that aren't async yet
-                    sync_processor = ImageProcessor(image)
-                    sync_processor.restore()
-                    processed = sync_processor.save_image()
-                    logger.info("Premium tool applied: %s", tool)
-                    return HttpResponse(processed, content_type="image/png")
-                
-                processed = await processor.save_image_async()
-                logger.info("Premium tool applied: %s", tool)
-                return HttpResponse(processed, content_type="image/png")
-            else:
-                # Use sync processor for other operations
-                processor = ImageProcessor(image)
-                
+            processor = ImageProcessor(request.FILES["image"])
             if tool == "super-resolution":
                 scale = int(request.POST.get("scale", 2))
                 processor.super_resolution(scale)
@@ -334,19 +262,14 @@ def premium(request, tool):
                 processor.add_border(width, color)
             else:
                 return JsonResponse({"error": "Invalid tool"}, status=400)
-                
             processed = processor.save_image()
             logger.info("Premium tool applied: %s", tool)
             return HttpResponse(processed, content_type="image/png")
         except Exception as e:
             logger.error("Premium tool error: %s", str(e))
             return JsonResponse({"error": str(e)}, status=500)
-    
-    if request.FILES.get("image"):
-        return asyncio.run(process_premium())
-    else:
-        logger.error("Invalid premium request")
-        return JsonResponse({"error": "Invalid request"}, status=400)
+    logger.error("Invalid premium request")
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 
 @csrf_exempt
@@ -527,18 +450,14 @@ def format(request, tool):
 
 
 @csrf_exempt
-@require_http_methods(["POST"])
 def compressor(request, tool):
-    async def process_compression():
+    if request.method == "POST" and request.FILES.get("image"):
         try:
-            image = request.FILES["image"]
-            processor = AsyncImageProcessor(image)
-            
+            processor = ImageProcessor(request.FILES["image"])
             if tool == "compress-image":
                 format = request.POST.get("format", "JPEG").upper()
                 if format not in ["JPEG", "PNG", "WEBP"]:
                     return JsonResponse({"error": "Invalid format"}, status=400)
-                
                 quality = int(request.POST.get("quality", 80))
                 compression = int(request.POST.get("compression", 6))
                 target_size = int(request.POST.get("target_size", 100))
@@ -549,7 +468,7 @@ def compressor(request, tool):
                     "strip_metadata", "false") == "true"
                 quantization = request.POST.get("quantization", "standard")
 
-                processed = await processor.compress_async(
+                processed = processor.compress_image(
                     target_size_kb=target_size,
                     format=format,
                     quality=quality,
@@ -561,83 +480,13 @@ def compressor(request, tool):
                 )
                 logger.info("Image compressed: %s", format)
                 return HttpResponse(processed, content_type=f"image/{format.lower()}")
-            
             return JsonResponse({"error": "Invalid tool"}, status=400)
         except Exception as e:
             logger.error("Compressor tool error: %s", str(e))
             return JsonResponse({"error": str(e)}, status=500)
-    
-    if request.FILES.get("image"):
-        return asyncio.run(process_compression())
-    else:
-        logger.error("Invalid compressor request")
-        return JsonResponse({"error": "Invalid request"}, status=400)
+    logger.error("Invalid compressor request")
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
-@csrf_exempt
-@require_http_methods(["POST"])
-def batch_process(request):
-    """Handle batch processing of multiple images."""
-    async def process_batch():
-        try:
-            images = request.FILES.getlist("image")
-            if not images:
-                return JsonResponse({"error": "No images provided"}, status=400)
-            
-            operation = request.POST.get("operation")
-            if not operation:
-                return JsonResponse({"error": "No operation specified"}, status=400)
-            
-            # Prepare parameters based on operation
-            params = {}
-            if operation == "resize":
-                params["width"] = int(request.POST.get("width", 800))
-                params["height"] = int(request.POST.get("height", 600))
-            elif operation in ["brightness", "contrast", "saturation"]:
-                params["factor"] = float(request.POST.get("factor", 1.0))
-            elif operation == "blur":
-                params["radius"] = float(request.POST.get("radius", 2.0))
-            elif operation == "rotate":
-                params["angle"] = int(request.POST.get("angle", 90))
-            elif operation == "flip":
-                params["direction"] = request.POST.get("direction", "horizontal")
-            elif operation == "format":
-                params["format"] = request.POST.get("format", "jpeg")
-                params["quality"] = int(request.POST.get("quality", 90))
-            
-            # Process batch asynchronously
-            batch_processor = BatchAsyncProcessor()
-            results = await batch_processor.process_batch_async(images, operation, params)
-            
-            # Return results as base64 encoded images or URLs
-            import base64
-            response_data = []
-            for i, result in enumerate(results):
-                if result:
-                    encoded_image = base64.b64encode(result).decode('utf-8')
-                    response_data.append({
-                        'index': i,
-                        'data': f"data:image/png;base64,{encoded_image}",
-                        'success': True
-                    })
-                else:
-                    response_data.append({
-                        'index': i,
-                        'error': 'Processing failed',
-                        'success': False
-                    })
-            
-            logger.info(f"Batch processed {len(results)} images with operation: {operation}")
-            return JsonResponse({
-                'results': response_data,
-                'total_processed': len(results),
-                'total_requested': len(images)
-            })
-            
-        except Exception as e:
-            logger.error("Batch processing error: %s", str(e))
-            return JsonResponse({"error": str(e)}, status=500)
-    
-    return asyncio.run(process_batch())
 
 def compressor_page(request):
     return render(request, "compressor.html")
