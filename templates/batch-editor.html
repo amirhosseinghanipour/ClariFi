@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ClariFi Batch Editor{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/batch-editor.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="relative">
+    <button id="left-tools-toggle" class="md:hidden fixed left-0 top-1/2 transform -translate-y-1/2 bg-black text-white p-2 z-30 border-r-2 border-white">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+        </svg>
+    </button>
+
+    <aside id="left-tools" class="fixed mt-20 md:mt-0 left-0 w-64 h-full overflow-y-auto bg-black border-r-2 border-white p-4 z-20 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+        <button class="md:hidden absolute top-2 right-2 text-black hover:text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <h2 class="text-2xl mb-4 font-mono uppercase">BATCH TOOLS</h2>
+        <div class="space-y-4">
+            <div class="accordion">
+                <button class="accordion-toggle">UPLOAD</button>
+                <div class="accordion-content space-y-2 p-2" style="display: block;">
+                    <div>
+                        <label class="text-sm font-mono uppercase block mb-1">SELECT MULTIPLE IMAGES</label>
+                        <input type="file" id="batch-upload" accept="image/*" multiple class="w-full p-1 border-2 border-white bg-black text-white">
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-toggle">OPERATION</button>
+                <div class="accordion-content space-y-2 p-2" style="display: block;">
+                    <div>
+                        <label class="text-sm font-mono uppercase block mb-1">CHOOSE OPERATION</label>
+                        <select id="batch-operation" class="w-full p-1">
+                            <option value="grayscale">GRAYSCALE</option>
+                            <option value="sepia">SEPIA</option>
+                            <option value="blur">BLUR</option>
+                            <option value="sharpen">SHARPEN</option>
+                            <option value="brightness">BRIGHTNESS</option>
+                            <option value="contrast">CONTRAST</option>
+                            <option value="saturation">SATURATION</option>
+                            <option value="resize">RESIZE</option>
+                            <option value="rotate">ROTATE</option>
+                            <option value="flip">FLIP</option>
+                            <option value="auto-enhance">AUTO ENHANCE</option>
+                            <option value="colorize">COLORIZE</option>
+                            <option value="super-resolution">SUPER RESOLUTION</option>
+                            <option value="restore">RESTORE</option>
+                            <option value="format">FORMAT CONVERT</option>
+                            <option value="hdr">HDR</option>
+                            <option value="cartoon">CARTOON</option>
+                            <option value="oil_painting">OIL PAINTING</option>
+                            <option value="watercolor">WATERCOLOR</option>
+                            <option value="sketch">SKETCH</option>
+                            <option value="emboss">EMBOSS</option>
+                            <option value="edge_detection">EDGE DETECTION</option>
+                        </select>
+                    </div>
+                    <div id="batch-params" class="space-y-2"></div>
+                    <button id="apply-batch" class="button-style w-full">PROCESS BATCH</button>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-toggle">PROGRESS</button>
+                <div class="accordion-content space-y-2 p-2">
+                    <div class="w-full bg-gray-700 h-4 border-2 border-white">
+                        <div id="batch-progress" class="bg-white h-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <p id="batch-status" class="text-sm font-mono uppercase text-gray-400">READY</p>
+                    <button id="download-batch" class="button-style w-full">DOWNLOAD ALL</button>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-4 md:ml-64">
+        <div class="container mx-auto">
+            <h1 class="text-4xl font-mono uppercase mb-6 text-center">BATCH EDITOR</h1>
+            <div class="border-2 border-white p-6 overflow-auto">
+                <h2 class="text-2xl mb-4 font-mono uppercase">BATCH PREVIEW</h2>
+                <div id="batch-preview" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 min-h-[200px]">
+                    <div class="col-span-full text-center font-mono uppercase text-gray-500 py-10">
+                        UPLOAD MULTIPLE IMAGES TO START BATCH PROCESSING
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.querySelectorAll('.accordion-toggle').forEach(button => {
+        button.addEventListener('click', () => {
+            const content = button.nextElementSibling;
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        });
+        const defaultOpen = ['UPLOAD', 'OPERATION'];
+        if (defaultOpen.includes(button.textContent)) {
+            button.nextElementSibling.style.display = 'block';
+        } else {
+            button.nextElementSibling.style.display = 'none';
+        }
+    });
+
+    document.getElementById('left-tools-toggle').addEventListener('click', () => {
+        const leftTools = document.getElementById('left-tools');
+        leftTools.classList.toggle('-translate-x-full');
+    });
+
+    document.querySelectorAll('#left-tools button').forEach(button => {
+        if (button.innerHTML.includes('M6 18L18 6M6 6l12 12')) {
+            button.addEventListener('click', () => {
+                const sidebar = button.closest('aside');
+                sidebar.classList.add('-translate-x-full');
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+    .slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 4px;
+        background: #ffffff;
+        outline: none;
+        opacity: 0.9;
+        transition: opacity .2s;
+        border: 1px solid #ffffff;
+    }
+    .slider:hover {
+        opacity: 1;
+    }
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 15px;
+        height: 15px;
+        background: #ffffff;
+        border: 2px solid #000000;
+        cursor: pointer;
+    }
+    .slider::-moz-range-thumb {
+        width: 15px;
+        height: 15px;
+        background: #ffffff;
+        border: 2px solid #000000;
+        cursor: pointer;
+        border-radius: 0;
+    }
+    @media (max-width: 767px) {
+        #left-tools {
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        #left-tools-toggle {
+            z-index: 40;
+        }
+    }
+</style>
+{% endblock %}

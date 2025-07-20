@@ -20,4 +20,5 @@ urlpatterns = [
     path("format/<str:tool>", views.format, name="format"),
     path("compressor", views.compressor_page, name="compressor"),
     path("compressor/<str:tool>", views.compressor, name="compressor_tool"),
+    path("batch-editor", views.batch_editor, name="batch_editor"),
 ]

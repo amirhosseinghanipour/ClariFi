@@ -62,15 +62,15 @@
                     </div>
                     <div class="opacity-50 cursor-not-allowed">
                         <label class="text-sm font-mono uppercase block mb-1 tooltip" data-tooltip="COMING SOON">HUE</label>
-                        <input type="range" disabled class="w-full slider">
+                        <input type="range" id="hue" min="0" max="1" step="0.01" value="0.5" class="w-full slider">
                     </div>
                     <div class="opacity-50 cursor-not-allowed">
                         <label class="text-sm font-mono uppercase block mb-1 tooltip" data-tooltip="COMING SOON">EXPOSURE</label>
-                        <input type="range" disabled class="w-full slider">
+                        <input type="range" id="exposure" min="0" max="2" step="0.05" value="1" disabled class="w-full slider">
                     </div>
                     <div class="opacity-50 cursor-not-allowed">
                         <label class="text-sm font-mono uppercase block mb-1 tooltip" data-tooltip="COMING SOON">VIBRANCE</label>
-                        <input type="range" disabled class="w-full slider">
+                        <input type="range" id="vibrance" min="0" max="2" step="0.05" value="1" disabled class="w-full slider">
                     </div>
                     <button id="reset-adjustments" class="button-style w-full mt-2">RESET ADJUST</button>
                 </div>
@@ -95,8 +95,15 @@
                     <button id="blur" class="button-style tooltip" data-tooltip="BLUR">BLUR</button>
                     <button id="sharpen" class="button-style tooltip" data-tooltip="SHARPEN">SHARP</button>
                     <button id="invert" class="button-style tooltip" data-tooltip="INVERT COLORS">INVERT</button>
-                    <button class="button-style opacity-50 cursor-not-allowed tooltip" data-tooltip="COMING SOON">VIGNETTE</button>
-                    <button class="button-style opacity-50 cursor-not-allowed tooltip" data-tooltip="COMING SOON">NOISE</button>
+                    <button id="vignette" class="button-style tooltip" data-tooltip="VIGNETTE EFFECT">VIGNETTE</button>
+                    <button id="noise" class="button-style tooltip" data-tooltip="ADD NOISE">NOISE</button>
+                    <button id="hdr" class="button-style tooltip" data-tooltip="HDR EFFECT">HDR</button>
+                    <button id="cartoon" class="button-style tooltip" data-tooltip="CARTOON EFFECT">CARTOON</button>
+                    <button id="oil-painting" class="button-style tooltip" data-tooltip="OIL PAINTING">OIL</button>
+                    <button id="watercolor" class="button-style tooltip" data-tooltip="WATERCOLOR">WATER</button>
+                    <button id="sketch" class="button-style tooltip" data-tooltip="PENCIL SKETCH">SKETCH</button>
+                    <button id="emboss" class="button-style tooltip" data-tooltip="EMBOSS EFFECT">EMBOSS</button>
+                    <button id="edge-detection" class="button-style tooltip" data-tooltip="EDGE DETECTION">EDGES</button>
                 </div>
             </div>
 
@@ -132,10 +139,106 @@
                         <button id="flip-vertical" class="button-style w-full tooltip" data-tooltip="FLIP VERTICAL">FLIP V</button>
                     </div>
                     <div class="opacity-50 cursor-not-allowed mt-2">
-                        <button class="button-style w-full tooltip" data-tooltip="COMING SOON">PERSPECTIVE</button>
+                        <button id="perspective" class="button-style w-full tooltip opacity-50 cursor-not-allowed" data-tooltip="COMING SOON">PERSPECTIVE</button>
                     </div>
                 </div>
             </div>
+
+            <div class="accordion">
+                <button class="accordion-toggle">TEXT & MEME</button>
+                <div class="accordion-content space-y-4 p-2">
+                    <div>
+                        <label class="text-sm font-mono uppercase block mb-1">ADD TEXT</label>
+                        <input type="text" id="text-content" class="w-full p-1 mb-2" placeholder="TEXT CONTENT">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="text-x" class="p-1" placeholder="X" value="10">
+                            <input type="number" id="text-y" class="p-1" placeholder="Y" value="10">
+                            <input type="number" id="text-size" class="p-1" placeholder="SIZE" value="20">
+                            <input type="color" id="text-color" class="p-1" value="#ffffff">
+                        </div>
+                        <button id="apply-text" class="button-style w-full mt-2">ADD TEXT</button>
+                    </div>
+                    <div>
+                        <label class="text-sm font-mono uppercase block mb-1">WATERMARK</label>
+                        <input type="text" id="watermark-text" class="w-full p-1 mb-2" placeholder="WATERMARK TEXT">
+                        <input type="range" id="watermark-opacity" min="0" max="1" step="0.1" value="0.5" class="w-full slider mb-2">
+                        <button id="apply-watermark" class="button-style w-full">ADD WATERMARK</button>
+                    </div>
+                    <div>
+                        <button id="extract-text" class="button-style w-full">EXTRACT TEXT (OCR)</button>
+                    </div>
+                    <div>
+                        <label class="text-sm font-mono uppercase block mb-1">MEME GENERATOR</label>
+                        <input type="text" id="meme-top" class="w-full p-1 mb-2" placeholder="TOP TEXT">
+                        <input type="text" id="meme-bottom" class="w-full p-1 mb-2" placeholder="BOTTOM TEXT">
+                        <button id="apply-meme" class="button-style w-full">CREATE MEME</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-toggle">PREMIUM TOOLS</button>
+                <div class="accordion-content space-y-4 p-2">
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="super-resolution" class="button-style tooltip" data-tooltip="UPSCALE 2X">UPSCALE</button>
+                        <button id="auto-enhance" class="button-style tooltip" data-tooltip="AUTO ENHANCE">ENHANCE</button>
+                        <button id="colorize" class="button-style tooltip" data-tooltip="COLORIZE GRAYSCALE">COLORIZE</button>
+                        <button id="remove-background" class="button-style tooltip" data-tooltip="REMOVE BACKGROUND">NO BG</button>
+                        <button id="restore" class="button-style tooltip" data-tooltip="RESTORE OLD PHOTO">RESTORE</button>
+                        <button id="red-eye" class="button-style tooltip" data-tooltip="REMOVE RED EYE">RED EYE</button>
+                    </div>
+                    <div>
+                        <label class="text-sm font-mono uppercase block mb-1">INPAINT (REMOVE OBJECT)</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="number" id="inpaint-x" class="p-1" placeholder="X" value="100">
+                            <input type="number" id="inpaint-y" class="p-1" placeholder="Y" value="100">
+                            <input type="number" id="inpaint-radius" class="p-1" placeholder="RADIUS" value="20">
+                        </div>
+                        <button id="apply-inpaint" class="button-style w-full mt-2">REMOVE OBJECT</button>
+                    </div>
+                    <div>
+                        <label class="text-sm font-mono uppercase block mb-1">FACE DETECTION</label>
+                        <select id="face-action" class="w-full p-1 mb-2">
+                            <option value="crop">CROP FACE</option>
+                            <option value="blur">BLUR FACE</option>
+                        </select>
+                        <button id="apply-face" class="button-style w-full">APPLY FACE</button>
+                    </div>
+                    <div>
+                        <label class="text-sm font-mono uppercase block mb-1">DENOISE</label>
+                        <input type="number" id="denoise-strength" class="w-full p-1 mb-2" placeholder="STRENGTH (1-30)" value="10">
+                        <button id="apply-denoise" class="button-style w-full">DENOISE</button>
+                    </div>
+                    <div>
+                        <label class="text-sm font-mono uppercase block mb-1">COLOR POP</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="color-pop-hue-min" class="p-1" placeholder="HUE MIN" value="0">
+                            <input type="number" id="color-pop-hue-max" class="p-1" placeholder="HUE MAX" value="30">
+                        </div>
+                        <button id="apply-color-pop" class="button-style w-full mt-2">COLOR POP</button>
+                    </div>
+                    <div>
+                        <label class="text-sm font-mono uppercase block mb-1">ADD BORDER</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="border-width" class="p-1" placeholder="WIDTH" value="10">
+                            <input type="color" id="border-color" class="p-1" value="#ffffff">
+                        </div>
+                        <button id="apply-border" class="button-style w-full mt-2">ADD BORDER</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-toggle">COLOR PALETTE</button>
+                <div class="accordion-content space-y-2 p-2">
+                    <div>
+                        <label class="text-sm font-mono uppercase block mb-1">EXTRACT COLORS</label>
+                        <input type="number" id="palette-colors" class="w-full p-1 mb-2" placeholder="NUMBER OF COLORS" value="5">
+                        <button id="extract-palette" class="button-style w-full">EXTRACT PALETTE</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="accordion">
                 <button class="accordion-toggle">EXPORT</button>
                 <div class="accordion-content space-y-2 p-2">
@@ -151,7 +254,6 @@
                         <input type="range" id="jpeg-quality" min="0.1" max="1" step="0.05" value="0.9" class="w-full slider">
                     </div>
                     <button id="download" class="button-style w-full mt-2">DOWNLOAD</button>
-                    <button id="save" class="button-style w-full mt-2 opacity-50 cursor-not-allowed tooltip" data-tooltip="COMING SOON">SAVE TO CLOUD</button>
                 </div>
             </div>
         </div>

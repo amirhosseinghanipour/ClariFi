@@ -490,3 +490,6 @@ def compressor(request, tool):
 
 def compressor_page(request):
     return render(request, "compressor.html")
+
+def batch_editor(request):
+    return render(request, "batch-editor.html")

@@ -205,6 +205,7 @@
                 <a href="{% url 'remove_background' %}" {% if request.resolver_match.url_name == 'remove_background' %}class="active"{% endif %} data-tooltip="Remove Background">REMOVER</a>
                 <a href="{% url 'converter' %}" {% if request.resolver_match.url_name == 'converter' %}class="active"{% endif %} data-tooltip="Convert Images">CONVERTER</a>
                 <a href="{% url 'compressor' %}" {% if request.resolver_match.url_name == 'compressor' %}class="active"{% endif %} data-tooltip="Compress Images">COMPRESSOR</a>
+                <a href="{% url 'batch_editor' %}" {% if request.resolver_match.url_name == 'batch_editor' %}class="active"{% endif %} data-tooltip="Batch Process">BATCH</a>
             </nav>
             <button class="hamburger" aria-label="Toggle mobile menu">☰</button>
             <nav class="mobile-nav" aria-label="Mobile navigation">
@@ -214,6 +215,7 @@
                 <a href="{% url 'remove_background' %}" {% if request.resolver_match.url_name == 'remove_background' %}class="active"{% endif %}>REMOVER</a>
                 <a href="{% url 'converter' %}" {% if request.resolver_match.url_name == 'converter' %}class="active"{% endif %}>CONVERTER</a>
                 <a href="{% url 'compressor' %}" {% if request.resolver_match.url_name == 'compressor' %}class="active"{% endif %}>COMPRESSOR</a>
+                <a href="{% url 'batch_editor' %}" {% if request.resolver_match.url_name == 'batch_editor' %}class="active"{% endif %}>BATCH</a>
             </nav>
         </div>
     </header>

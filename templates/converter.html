@@ -60,7 +60,7 @@
           </div>
           <div>
             <label class="text-sm font-mono uppercase">QUALITY (JPEG/WEBP)</label>
-            <input type="range" id="quality-slider" min="1" max="100" value="90" class="w-full slider">
+            <input type="range" id="convert-quality" min="1" max="100" value="90" class="w-full slider">
           </div>
           <div>
             <label class="text-sm font-mono uppercase">COMPRESSION (PNG)</label>
@@ -69,8 +69,8 @@
           <div>
             <label class="text-sm font-mono uppercase">RESIZE (W,H)</label>
             <div class="grid grid-cols-2 gap-2">
-              <input type="number" id="convert-width" class="p-1" placeholder="WIDTH">
-              <input type="number" id="convert-height" class="p-1" placeholder="HEIGHT">
+              <input type="number" id="convert-width" class="p-1" placeholder="WIDTH" value="0">
+              <input type="number" id="convert-height" class="p-1" placeholder="HEIGHT" value="0">
             </div>
             <label class="flex gap-2 items-center text-sm font-mono uppercase mt-4">
               <input type="checkbox" id="convert-aspect" checked> MAINTAIN ASPECT
@@ -83,7 +83,7 @@
           </div>
           <div>
             <label class="text-sm font-mono uppercase">COLOR MODE</label>
-            <select id="convert-color" class="w-full p-2">
+            <select id="convert-color" class="w-full p-1">
               <option value="RGB">RGB</option>
               <option value="L">GRAYSCALE</option>
               <option value="CMYK">CMYK</option>
@@ -91,7 +91,7 @@
           </div>
           <div>
             <label class="text-sm font-mono uppercase">DPI</label>
-            <select id="convert-dpi" class="w-full p-2">
+            <select id="convert-dpi" class="w-full p-1">
               <option value="72">72</option>
               <option value="150">150</option>
               <option value="300">300</option>
@@ -99,7 +99,7 @@
           </div>
           <div>
             <label class="text-sm font-mono uppercase">BACKGROUND</label>
-            <input type="color" id="convert-background" class="w-full p-1" value="#ffffff">
+            <input type="color" id="convert-background" class="w-full h-8" value="#ffffff">
           </div>
         </div>
       </div>

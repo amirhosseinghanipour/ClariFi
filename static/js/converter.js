@@ -161,6 +161,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData();
         formData.append("image", currentImageFile);
         formData.append("format", targetFormat);
+        formData.append("quality", parseInt(document.getElementById('convert-quality')?.value || 90));
+        formData.append("compression", parseInt(document.getElementById('convert-compression')?.value || 6));
+        formData.append("width", parseInt(document.getElementById('convert-width')?.value || 0));
+        formData.append("height", parseInt(document.getElementById('convert-height')?.value || 0));
+        formData.append("aspect", document.getElementById('convert-aspect')?.checked ? "true" : "false");
+        formData.append("strip", document.getElementById('convert-strip')?.checked ? "true" : "false");
+        formData.append("color", document.getElementById('convert-color')?.value || "RGB");
+        formData.append("dpi", parseInt(document.getElementById('convert-dpi')?.value || 72));
+        formData.append("background", document.getElementById('convert-background')?.value || "#ffffff");
 
         fetch("/format/convert-format", {
             method: "POST",
