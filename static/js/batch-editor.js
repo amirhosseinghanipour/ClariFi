@@ -146,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('image', file);
 
         let endpoint = '';
+      
         
         switch (operation) {
             case 'grayscale':
@@ -211,16 +212,43 @@ document.addEventListener('DOMContentLoaded', () => {
         return {
             blob,
             originalName: file.name,
-            index
+      if (operationSelect.value === 'brightness' || operationSelect.value === 'contrast' || operationSelect.value === 'saturation') {
+        formData.append('factor', document.getElementById('batch-factor')?.value || 1);
+      }
+      if (operationSelect.value === 'blur') {
+        formData.append('radius', document.getElementById('batch-radius')?.value || 2);
+      }
+      if (operationSelect.value === 'rotate') {
+        formData.append('angle', document.getElementById('batch-angle')?.value || 90);
+      }
+      if (operationSelect.value === 'flip') {
+        formData.append('direction', document.getElementById('batch-direction')?.value || 'horizontal');
+      }
+      if (operationSelect.value === 'format') {
+        formData.append('format', document.getElementById('batch-format')?.value || 'jpeg');
+      }
+      
+      fetch('/batch-process', {
         };
     }
 
     function displayProcessedImages() {
-        batchPreview.innerHTML = '';
-        processedImages.forEach((result, index) => {
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
             const container = document.createElement('div');
             container.className = 'border-2 border-white p-2';
-            
+          
+          if (data.results) {
+            data.results.forEach((result, index) => {
+              if (result.success) {
+                const container = document.createElement('div');
+                container.className = 'border-2 border-white p-2';
+                
             const img = document.createElement('img');
             img.src = URL.createObjectURL(result.blob);
             img.className = 'w-full h-32 object-cover mb-2';
@@ -234,10 +262,38 @@ document.addEventListener('DOMContentLoaded', () => {
             downloadBtn.className = 'button-style w-full text-xs py-1 mt-1';
             downloadBtn.onclick = () => downloadSingle(result);
             
-            container.appendChild(img);
+                img.src = result.data;
             container.appendChild(name);
-            container.appendChild(downloadBtn);
-            batchPreview.appendChild(container);
+                
+                const name = document.createElement('p');
+                name.textContent = `Image ${index + 1} (processed)`;
+                name.className = 'text-xs font-mono uppercase truncate mt-2';
+                
+                const downloadBtn = document.createElement('button');
+                downloadBtn.textContent = 'DOWNLOAD';
+                downloadBtn.className = 'button-style w-full text-xs py-1 mt-1';
+                downloadBtn.onclick = () => downloadFromDataUrl(result.data, `batch_${index + 1}_${operationSelect.value}.png`);
+                
+                container.appendChild(img);
+                container.appendChild(name);
+                container.appendChild(downloadBtn);
+                preview.appendChild(container);
+              } else {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'border-2 border-red-500 p-2 text-red-500';
+                errorDiv.textContent = `Image ${index + 1}: ${result.error || 'Processing failed'}`;
+                preview.appendChild(errorDiv);
+              }
+            });
+            
+            updateBatchStatus(`Processed ${data.total_processed}/${data.total_requested} images successfully`);
+          } else {
+            updateBatchStatus('No results returned from server', true);
+          }
+        })
+        .catch(error => {
+          console.error('Batch processing error:', error);
+          updateBatchStatus(`Error: ${error.message}`, true);
         });
     }
 
@@ -274,6 +330,15 @@ document.addEventListener('DOMContentLoaded', () => {
             batchStatus.textContent = message;
             batchStatus.className = `text-sm font-mono uppercase ${isError ? 'text-red-500' : 'text-green-500'}`;
         }
+    }
+
+    function downloadFromDataUrl(dataUrl, filename) {
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     function getCookie(name) {

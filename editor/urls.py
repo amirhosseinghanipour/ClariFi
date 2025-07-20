@@ -21,4 +21,5 @@ urlpatterns = [
     path("compressor", views.compressor_page, name="compressor"),
     path("compressor/<str:tool>", views.compressor, name="compressor_tool"),
     path("batch-editor", views.batch_editor, name="batch_editor"),
+    path("batch-process", views.batch_process, name="batch_process"),
 ]
